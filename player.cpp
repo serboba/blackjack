@@ -7,25 +7,22 @@
 #include "card.h"
 using namespace std;
 
-class Player{
-    int no;
-    int money;
+Player::Player(){}
 
-    public:
+Player::Player(int no, int money){
+    this->no = no;
+    this->money = money;
+}
 
-    void setPlayerNo(int n){
-        no = n;
-    }
-    int getPlayerNo(){
-        return no;
-    }
+void Player::withdraw(int amount){
+    this->money = (this->money)-amount;
+}
 
-    void setMoney(int x){
-        money = x;
-    }
-    int getMoney(){
-        return money;
-    }
+void Player::setMoney(int x){
+    this->money = x;
+}
+    
 
-
-};
+void Player::deposit(int amount){
+    this->money = (this->money)+amount;
+}

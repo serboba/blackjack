@@ -10,9 +10,10 @@ Card::Card(){
 
 }
 
-Card::Card(char val, std::string col){
+Card::Card(char val, std::string col, int hit_flag){
     this->value = val;
     this->color = col;
+    this->hit_flag = hit_flag;
 }
 
 void Card::setVal(char val){
@@ -23,6 +24,9 @@ void Card::setCol(std::string col){
     color = col;
 }
 
+void Card::setFlag(int x){
+    this->hit_flag = x;
+}
 /* cols = 'spades', 'diamonds', 'hearts', 'clubs'
         suits_symbols = '♠', '♦', '♥', '♣' */
         /* 
