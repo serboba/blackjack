@@ -5,6 +5,7 @@
 #include <string>
 #include <list>
 #include "card.h"
+#include <Windows.h>
 using namespace std;
 
 class Printer {
@@ -13,6 +14,9 @@ public:
     Printer();
     
     std::string get_symbol(std::string s){
+
+        SetConsoleCP(CP_UTF8);
+        SetConsoleOutputCP(CP_UTF8);
     if(s.compare("diamonds")==0){
             return "♦";
         }else if(s.compare("hearts")==0){
@@ -27,6 +31,9 @@ public:
 
 
     void get_card_print(std::list<Card> &hand){
+
+        SetConsoleCP(437);
+        SetConsoleOutputCP(437);
 
         string s="";
         for(Card c: hand){

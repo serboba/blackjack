@@ -4,14 +4,16 @@
 #include "printer.h"
 #include <stack>
 #include <list>
-#include <time.h>
-#include <stdlib.h>
-
-#include <unistd.h>
+#include <ctime>
+#include <cstdlib>
+#include <Windows.h>
+#include <random>
 
 using namespace std;
 Printer print;
-    
+
+
+
 
 Card * initDeck(){
     Card *deck = new Card[52];
@@ -44,7 +46,7 @@ int get_hand_value(std::list<Card> hand){
         hand.pop_front();
         //cout << "current hoe:" <<hob.getVal() << endl;
         if (hob.getVal() == 'A') {
-            if (value < 11) {
+            if (ace_flag==0 && value< 11) {
                 value += 11;
                 ace_flag =1;
             } else {
@@ -57,9 +59,10 @@ int get_hand_value(std::list<Card> hand){
         }else{
             int keko = (hob.getVal()-48);
             value += keko;
-            if(value >21 && ace_flag == 1){
-                value -= 10;
-            }
+        }
+        if(value >21 && ace_flag == 1){
+            value -= 10;
+            ace_flag=0;
         }
     }
     //cout<< "finito: " << value <<endl;
@@ -80,10 +83,10 @@ int validate_hand(int value){
 }
 
 void hit_card(Card deck[], std::list<Card> &hand){
-    int random = rand()%51 +1;
+    int random = std::rand() %51 +1;
     
     while(1){
-        random = rand()%51 + 1;
+        random = std::rand()%51 + 1;
         if ((deck[random]).getFlag() != 1){
             //cout <<"U HIT: " <<(deck[random]).getVal() <<"-"<<(deck[random]).getColor() << endl;
             hand.push_back((deck[random]));
@@ -152,32 +155,37 @@ void play_dealer(Card * deck, std::list<Card> &hand, int player_value){
     int dealer_value = 0;
     print.get_card_print(hand);
     cout << "Dealer has before he draws: " << get_hand_value(hand) << endl;
+    if(check_tie(player_value, get_hand_value(hand) ==1)){
+        return;
+    }
     while(validate_hand(get_hand_value(hand))){
         if(get_hand_value(hand) > player_value || check_tie(player_value, dealer_value)){
             //cout << "hold up" << endl;
             break;
         }
-        sleep(5);
+        Sleep(3000);
         hit_card(deck,hand);
         print.get_card_print(hand);
         dealer_value = get_hand_value(hand);
 
         cout << "Dealer has : " << get_hand_value(hand) << endl;
-        sleep(5);
+        Sleep(3000);
     }
     return;
 }
 
 int get_winner(int player_value, int dealer_value){
     if (player_value> 21){
-        cout << "  $$$$$$$\\  $$\\   $$\\  $$$$$$\\ $$$$$$$$\\       $$\\     $$\\  $$$$$$\\  $$\\   $$\\       $$\\       $$$$$$\\   $$$$$$\\ $$$$$$$$\\ "<<endl;
-        cout << "  $$  __$$\\ $$ |  $$ |$$  __$$\\\\__$$  __|      \\$$\\   $$  |$$  __$$\\ $$ |  $$ |      $$ |     $$  __$$\\ $$  __$$\\\\__$$  __|"<<endl;
-        cout << "  $$ |  $$ |$$ |  $$ |$$ /  \\__|  $$ |          \\$$\\ $$  / $$ /  $$ |$$ |  $$ |      $$ |     $$ /  $$ |$$ /  \\__|  $$ |   "<<endl;
-        cout << "  $$$$$$$\\ |$$ |  $$ |\\$$$$$$\\    $$ |           \\$$$$  /  $$ |  $$ |$$ |  $$ |      $$ |     $$ |  $$ |\\$$$$$$\\    $$ |   "<<endl;
-        cout << "  $$  __$$\\ $$ |  $$ | \\____$$\\   $$ |            \\$$  /   $$ |  $$ |$$ |  $$ |      $$ |     $$ |  $$ | \\____$$\\   $$ |   "<<endl;
-        cout << "  $$ |  $$ |$$ |  $$ |$$\\   $$ |  $$ |             $$ |    $$ |  $$ |$$ |  $$ |      $$ |     $$ |  $$ |$$\\   $$ |  $$ |   "<<endl;
-        cout << "  $$$$$$$  |\\$$$$$$  |\\$$$$$$  |  $$ |             $$ |     $$$$$$  |\\$$$$$$  |      $$$$$$$$\\ $$$$$$  |\\$$$$$$  |  $$ |   "<<endl;
+        cout << R"(  $$$$$$$\  $$\   $$\  $$$$$$\ $$$$$$$$\       $$\     $$\  $$$$$$\  $$\   $$\       $$\       $$$$$$\   $$$$$$\ $$$$$$$$\ )"<<endl;
+        cout << R"(  $$  __$$\ $$ |  $$ |$$  __$$\\__$$  __|      \$$\   $$  |$$  __$$\ $$ |  $$ |      $$ |     $$  __$$\ $$  __$$\\__$$  __|)"<<endl;
+        cout << R"(  $$ |  $$ |$$ |  $$ |$$ /  \__|  $$ |          \$$\ $$  / $$ /  $$ |$$ |  $$ |      $$ |     $$ /  $$ |$$ /  \__|  $$ |   )"<<endl;
+        cout << R"(  $$$$$$$\ |$$ |  $$ |\$$$$$$\    $$ |           \$$$$  /  $$ |  $$ |$$ |  $$ |      $$ |     $$ |  $$ |\$$$$$$\    $$ |   )"<<endl;
+        cout << R"(  $$  __$$\ $$ |  $$ | \____$$\   $$ |            \$$  /   $$ |  $$ |$$ |  $$ |      $$ |     $$ |  $$ | \____$$\   $$ |   )"<<endl;
+        cout << R"(  $$ |  $$ |$$ |  $$ |$$\\   $$ |  $$ |             $$ |    $$ |  $$ |$$ |  $$ |      $$ |     $$ |  $$ |$$\\   $$ |  $$ |   )"<<endl;
+        cout << R"(  $$$$$$$  |\\$$$$$$  |\\$$$$$$  |  $$ |             $$ |     $$$$$$  |\\$$$$$$  |      $$$$$$$$\\ $$$$$$  |\\$$$$$$  |  $$ |   )"<<endl;
         cout << "  \\_______/  \\______/  \\______/   \\__|             \\__|     \\______/  \\______/       \\________|\\______/  \\______/   \\__|   "<<endl;
+
+        Sleep(5000);
 
         return 0;
     }else if (player_value == dealer_value){
@@ -189,6 +197,8 @@ int get_winner(int player_value, int dealer_value){
         cout <<"     $$ |     $$ |  $$ |      $$ |  $$ |      $$ |  $$ |$$ |  $$ |$$ |\\$  /$$ |$$ |      " << endl;
         cout <<"     $$ |   $$$$$$\\ $$$$$$$$\\ $$$$$$$  |      \\$$$$$$  |$$ |  $$ |$$ | \\_/ $$ |$$$$$$$$\\ " << endl;
         cout <<"     \\__|   \\______|\\________|\\_______/        \\______/ \\__|  \\__|\\__|     \\__|\\________|" << endl;
+
+        Sleep(5000);
             return 1;
     }else if(player_value < dealer_value && dealer_value <=21){
         cout << "  $$$$$$$\\  $$$$$$$$\\  $$$$$$\\  $$\\       $$$$$$$$\\ $$$$$$$\\        $$\\      $$\\  $$$$$$\\  $$\\   $$\\ " << endl;
@@ -200,7 +210,7 @@ int get_winner(int player_value, int dealer_value){
         cout << "  $$$$$$$  |$$$$$$$$\\ $$ |  $$ |$$$$$$$$\\ $$$$$$$$\\ $$ |  $$ |      $$  /   \\$$ | $$$$$$  |$$ | \\$$ |" << endl;
         cout << "  \\_______/ \\________|\\__|  \\__|\\________|\\________|\\__|  \\__|      \\__/     \\__| \\______/ \\__|  \\__|" << endl;
 
-        
+        Sleep(5000);
         return 0;
     }else{
         cout << "  $$\\     $$\\  $$$$$$\\  $$\\   $$\\       $$\\      $$\\  $$$$$$\\  $$\\   $$\\  " <<endl;
@@ -211,7 +221,8 @@ int get_winner(int player_value, int dealer_value){
         cout << "      $$ |    $$ |  $$ |$$ |  $$ |      $$$  / \\$$$ |$$ |  $$ |$$ |\\$$$ | " <<endl;
         cout << "      $$ |     $$$$$$  |\\$$$$$$  |      $$  /   \\$$ | $$$$$$  |$$ | \\$$ | " <<endl;
         cout << "      \\__|     \\______/  \\______/       \\__/     \\__| \\______/ \\__|  \\__| " <<endl;
-            
+
+        Sleep(5000);
         return 2;
     }
     return 0;
@@ -219,7 +230,7 @@ int get_winner(int player_value, int dealer_value){
 
 Player random_money (){
     int chips [7] = {100, 200, 250, 500, 1000, 2000, 5000};
-    int random = rand()%6+1;
+    int random = std::rand()%6+1;
     cout<< "bro u got lucky u won : " << endl;
 cout<<"          ,/`."<<endl;
 cout<<"        ,'/ $$`." <<endl;
@@ -264,10 +275,10 @@ int play_on_console(){
 
     //print_dealer_hand(dealer_hand);
     //get_card_print(player_hand);
-    
-    
+
     srand ( time(NULL) );
-    Player p;;
+
+    Player p;
     p = random_money();
     cout << p.getMoney() << endl;
     int bet;
@@ -305,7 +316,9 @@ int play_on_console(){
     cout <<"  $$$$$$$  |$$$$$$$$\\ $$ |  $$ |\\$$$$$$  |$$ | \\$$\\\\$$$$$$  |$$ |  $$ |\\$$$$$$  |$$ | \\$$\\ "<<endl;
     cout <<"  \\_______/ \\________|\\__|  \\__| \\______/ \\__|  \\__|\\______/ \\__|  \\__| \\______/ \\__|  \\__| "<<endl;                                                                                   
     cout << "YOU WON" << endl;
-        p.deposit((3/2)*bet);
+    int m = p.getMoney();
+    m += bet*(3/2);
+    p.setMoney(m);
         continue;
     }
 
@@ -333,6 +346,9 @@ int play_on_console(){
 
     play_player(deck,player_hand,p,bet);
 
+    cout<<"NOW IS DEALERS TURN. DEALERS HAND:" << endl;
+    print.print_dealer_hand(dealer_hand);
+    Sleep(5000);
     int player_value = get_hand_value(player_hand);
     if (player_value <=21){
         play_dealer(deck,dealer_hand, player_value);
@@ -356,6 +372,7 @@ int play_on_console(){
     }
 }
 
+    Sleep(5000);
     return 0;
 
 }
